@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/frameLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#252525"
@@ -11,33 +12,230 @@
          is needed to present your content, e.g. VideoView, SurfaceView,
          TextureView, etc. -->
 
+    <Button
+        android:id="@+id/connect_button2"
+        style="?metaButtonBarButtonStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="#1c5a76"
+        android:text="@string/connect_button"
+        android:textColor="@android:color/background_light" />
+
     <pl.droidsonroids.gif.GifImageView
         android:id="@+id/backdrop"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:scaleType="fitXY"
-        android:src="@drawable/backdrop_landscape3"
-        />
+        android:src="@drawable/backdrop1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <!-- This FrameLayout insets its children based on system windows using
          android:fitsSystemWindows. -->
     <TextView
         android:id="@+id/fullscreen_content"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fontFamily="cursive"
+        android:layout_width="950dp"
+        android:layout_height="421dp"
+        android:layout_marginTop="8dp"
+        android:fontFamily="monospace"
         android:gravity="center"
         android:keepScreenOn="true"
         android:textAlignment="center"
         android:textAllCaps="false"
-        android:text="@string/home_text"
-        android:textColor="@android:color/background_light"
-        android:textSize="50sp" />
+        android:textSize="50sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/connect_button2" />
+
+    <pl.droidsonroids.gif.GifImageView
+        android:id="@+id/pikachu"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:adjustViewBounds="true"
+        android:cropToPadding="true"
+        android:scaleType="fitXY"
+        android:src="@drawable/pikachu"
+        app:layout_constraintBottom_toTopOf="@+id/parameters2"
+        app:layout_constraintEnd_toEndOf="@+id/fullscreen_content" />
+
+    <pl.droidsonroids.gif.GifImageView
+        android:id="@+id/connectedIndicator"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginBottom="12dp"
+        android:layout_marginStart="8dp"
+        android:adjustViewBounds="true"
+        android:cropToPadding="true"
+        android:scaleType="fitXY"
+        android:src="@drawable/japan_map"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/parameters2"
+        app:layout_constraintStart_toStartOf="@+id/fullscreen_content" />
+
+    <LinearLayout
+        android:id="@+id/parameters"
+        style="?metaButtonBarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:background="@color/black_overlay"
+        android:orientation="horizontal"
+        tools:ignore="UselessParent"
+        tools:layout_editor_absoluteX="48dp"
+        tools:layout_editor_absoluteY="479dp">
+
+        <Button
+            android:id="@+id/rpmValue"
+            style="?metaButtonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black_overlay"
+            android:textSize="35sp"
+            android:drawableLeft="@drawable/rpm"
+            android:textColor="@android:color/background_light" />
+
+        <Button
+            android:id="@+id/speedValue"
+            style="?metaButtonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black_overlay"
+            android:text=""
+            android:textSize="35sp"
+            android:drawableLeft="@drawable/speed"
+            android:textColor="@android:color/background_light" />
+
+        <Button
+            android:id="@+id/coolantValue"
+            style="?metaButtonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black_overlay"
+            android:text=""
+            android:textSize="35sp"
+            android:drawableLeft="@drawable/coolant"
+            android:textColor="@android:color/background_light" />
+
+        <Button
+            android:id="@+id/throttleValue"
+            style="?metaButtonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black_overlay"
+            android:text=""
+            android:textSize="35sp"
+            android:drawableLeft="@drawable/throttle"
+            android:textColor="@android:color/background_light" />
+
+        <Button
+            android:id="@+id/oilValue"
+            style="?metaButtonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black_overlay"
+            android:text=""
+            android:textSize="35sp"
+            android:drawableLeft="@drawable/oil"
+            android:textColor="@android:color/background_light" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/parameters2"
+        style="?metaButtonBarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:background="@color/black_overlay"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:ignore="UselessParent"
+        tools:layout_editor_absoluteX="0dp">
+
+        <Button
+            android:id="@+id/intakeManifoldValue"
+            style="?metaButtonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black_overlay"
+            android:drawableLeft="@drawable/manifold"
+            android:textColor="@android:color/background_light"
+            android:textSize="35sp" />
+
+        <Button
+            android:id="@+id/fuelPressureValue"
+            style="?metaButtonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black_overlay"
+            android:drawableLeft="@drawable/fuelpressure"
+            android:text=""
+            android:textColor="@android:color/background_light"
+            android:textSize="35sp" />
+
+        <Button
+            android:id="@+id/intakeAirTempValue"
+            style="?metaButtonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black_overlay"
+            android:drawableLeft="@drawable/airintake"
+            android:text=""
+            android:textColor="@android:color/background_light"
+            android:textSize="35sp" />
+
+        <Button
+            android:id="@+id/moduleVoltageValue"
+            style="?metaButtonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black_overlay"
+            android:drawableLeft="@drawable/voltage"
+            android:text=""
+            android:textColor="@android:color/background_light"
+            android:textSize="35sp" />
+
+        <Button
+            android:id="@+id/fuelLevelValue"
+            style="?metaButtonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black_overlay"
+            android:drawableLeft="@drawable/fuellevel"
+            android:text=""
+            android:textColor="@android:color/background_light"
+            android:textSize="35sp" />
+
+    </LinearLayout>
 
     <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fitsSystemWindows="true">
+        android:id="@+id/frameLayout2"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/black_overlay"
+        android:fitsSystemWindows="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
 
         <ListView
             android:id="@+id/bluetooth_devices"
@@ -71,4 +269,4 @@
 
     </FrameLayout>
 
-</FrameLayout>
+</android.support.constraint.ConstraintLayout>

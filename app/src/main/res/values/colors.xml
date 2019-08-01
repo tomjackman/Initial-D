@@ -5,5 +5,5 @@
     <color name="colorAccent">#ff404a</color>
     <color name="colorPositive">#26c43b</color>
     <color name="colorWhite">#fff</color>
-    <color name="black_overlay">#66000000</color>
+    <color name="black_overlay">#28000000</color>
 </resources>
