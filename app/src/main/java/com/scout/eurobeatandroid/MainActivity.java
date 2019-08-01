@@ -22,13 +22,26 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.pires.obd.commands.SpeedCommand;
+import com.github.pires.obd.commands.control.ModuleVoltageCommand;
+import com.github.pires.obd.commands.engine.AbsoluteLoadCommand;
+import com.github.pires.obd.commands.engine.OilTempCommand;
 import com.github.pires.obd.commands.engine.RPMCommand;
+import com.github.pires.obd.commands.engine.ThrottlePositionCommand;
+import com.github.pires.obd.commands.fuel.FuelLevelCommand;
+import com.github.pires.obd.commands.pressure.FuelPressureCommand;
+import com.github.pires.obd.commands.pressure.IntakeManifoldPressureCommand;
+import com.github.pires.obd.commands.protocol.AvailablePidsCommand_01_20;
+import com.github.pires.obd.commands.protocol.AvailablePidsCommand_21_40;
 import com.github.pires.obd.commands.protocol.EchoOffCommand;
 import com.github.pires.obd.commands.protocol.HeadersOffCommand;
 import com.github.pires.obd.commands.protocol.LineFeedOffCommand;
 import com.github.pires.obd.commands.protocol.SelectProtocolCommand;
 import com.github.pires.obd.commands.protocol.SpacesOffCommand;
 import com.github.pires.obd.commands.protocol.TimeoutCommand;
+import com.github.pires.obd.commands.temperature.AirIntakeTemperatureCommand;
+import com.github.pires.obd.commands.temperature.EngineCoolantTemperatureCommand;
+import com.github.pires.obd.commands.temperature.TemperatureCommand;
 import com.github.pires.obd.enums.ObdProtocols;
 
 import java.io.IOException;
@@ -165,6 +178,9 @@ public class MainActivity extends AppCompatActivity {
         // choose calm backdrop on start
         chooseRandomBackdrop();
 
+        // make pikachu paused on start
+        pausePikachu();
+
         // change backdrop every 30 seconds
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -229,6 +245,7 @@ public class MainActivity extends AppCompatActivity {
                     findViewById(R.id.connect_button).setBackgroundColor(getResources().getColor(R.color.colorPositive));
                     Button connectButton = findViewById(R.id.connect_button);
                     connectButton.setText("Connected to " + device.getName());
+                    startPikachu();
                 }});
 
                 try {
@@ -402,28 +419,99 @@ public class MainActivity extends AppCompatActivity {
      * Monitor the vehicle RPM and Throttle %.
      */
     private void monitorParameters() {
+            final GifImageView liveIndicator = findViewById(R.id.connectedIndicator);
 
             try {
                 BluetoothSocket socket = bluetooth.getSocket();
+
                 RPMCommand rpmCommand = new RPMCommand();
                 rpmCommand.run(socket.getInputStream(), socket.getOutputStream());
                 final int rpm = rpmCommand.getRPM();
+                final String rpmResult = rpmCommand.getFormattedResult();
 
-                System.out.println("RPM > " + rpm);
+                SpeedCommand speedCommand = new SpeedCommand();
+                speedCommand.run(socket.getInputStream(), socket.getOutputStream());
+                final String speedResult = speedCommand.getFormattedResult();
+
+                EngineCoolantTemperatureCommand coolantCommand = new EngineCoolantTemperatureCommand();
+                coolantCommand.run(socket.getInputStream(), socket.getOutputStream());
+                final String coolantResult = coolantCommand.getFormattedResult();
+
+                ThrottlePositionCommand throttlePositionCommand = new ThrottlePositionCommand();
+                throttlePositionCommand.run(socket.getInputStream(), socket.getOutputStream());
+                final float throttle = throttlePositionCommand.getPercentage();
+                final String thottlePositionResult = throttlePositionCommand.getFormattedResult();
+
+//                OilTempCommand oilTempCommand = new OilTempCommand();
+//                oilTempCommand.run(socket.getInputStream(), socket.getOutputStream());
+//                final String oilTempResult = oilTempCommand.getFormattedResult();
+                final String oilTempResult = "N/A";
+
+//                IntakeManifoldPressureCommand intakeManifoldPressureCommand = new IntakeManifoldPressureCommand();
+//                intakeManifoldPressureCommand.run(socket.getInputStream(), socket.getOutputStream());
+//                final String intakeManifoldPressureResult = intakeManifoldPressureCommand.getFormattedResult();
+                final String intakeManifoldPressureResult = "N/A";
+
+//                FuelPressureCommand fuelPressureCommand = new FuelPressureCommand();
+//                fuelPressureCommand.run(socket.getInputStream(), socket.getOutputStream());
+//                final String fuelPressureResult = fuelPressureCommand.getFormattedResult();
+                final String fuelPressureResult = "N/A";
+
+//                AirIntakeTemperatureCommand airIntakeTemperatureCommand = new AirIntakeTemperatureCommand();
+//                airIntakeTemperatureCommand.run(socket.getInputStream(), socket.getOutputStream());
+//                final String airIntakeTemperatureResult = airIntakeTemperatureCommand.getFormattedResult();
+                final String airIntakeTemperatureResult = "N/A";
+
+//                ModuleVoltageCommand moduleVoltageCommand = new ModuleVoltageCommand();
+//                moduleVoltageCommand.run(socket.getInputStream(), socket.getOutputStream());
+//                final String moduleVoltageResult = moduleVoltageCommand.getFormattedResult();
+                final String moduleVoltageResult = "N/A";
+
+//                FuelLevelCommand fuelLevelCommand = new FuelLevelCommand();
+//                fuelLevelCommand.run(socket.getInputStream(), socket.getOutputStream());
+//                final String fuelLevelResult = fuelLevelCommand.getFormattedResult();
+                final String fuelLevelResult = "N/A";
 
                 // show RPM on display
                 runOnUiThread(new Runnable() {
                     public void run() {
-                        // choose new euro beat gif
-                        TextView homeText = findViewById(R.id.fullscreen_content);
-                        homeText.setText("Initial D / " + rpm + " RPM");
-                        homeText.setTextSize(50);
+                        // update live values
+                        TextView rpmText = findViewById(R.id.rpmValue);
+                        rpmText.setText(rpmResult);
 
+                        TextView speedText = findViewById(R.id.speedValue);
+                        speedText.setText(speedResult);
 
+                        TextView coolantText = findViewById(R.id.coolantValue);
+                        coolantText.setText(coolantResult);
+
+                        TextView throttleText = findViewById(R.id.throttleValue);
+                        throttleText.setText(thottlePositionResult);
+
+                        TextView oilText = findViewById(R.id.oilValue);
+                        oilText.setText(oilTempResult);
+
+                        TextView intakeManifoldText = findViewById(R.id.intakeManifoldValue);
+                        intakeManifoldText.setText(intakeManifoldPressureResult);
+
+                        TextView fuelPressureText = findViewById(R.id.fuelPressureValue);
+                        fuelPressureText.setText(fuelPressureResult);
+
+                        TextView intakeAirTempText = findViewById(R.id.intakeAirTempValue);
+                        intakeAirTempText.setText(airIntakeTemperatureResult);
+
+                        TextView moduleVoltageText = findViewById(R.id.moduleVoltageValue);
+                        moduleVoltageText.setText(moduleVoltageResult);
+
+                        TextView fuelLevelText = findViewById(R.id.fuelLevelValue);
+                        fuelLevelText.setText(fuelLevelResult);
+
+                        // show live indicator
+                        liveIndicator.setVisibility(View.VISIBLE);
                     }
                 });
 
-                if (rpm > 5000 && !euroBeatPlaying) {
+                if ((rpm > 5000 || throttle > 70) && !euroBeatPlaying) {
                     // choose euro beat song
                     chooseEuroBeatMusic();
 
@@ -435,6 +523,10 @@ public class MainActivity extends AppCompatActivity {
                             try {
                                 gifDrawable = new GifDrawable(getResources(), chooseEuroBeatBackdrop());
                                 imageView.setImageDrawable(gifDrawable);
+
+                                // make pikachu dance
+                                dancePikachu();
+
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -446,15 +538,63 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
                 runOnUiThread(new Runnable() {
                     public void run() {
-                        // choose new euro beat gif
+                        // update bluetooth connect button to show error
                         show();
                         findViewById(R.id.connect_button).setBackgroundColor(getResources().getColor(R.color.colorAccent));
                         Button connectButton = findViewById(R.id.connect_button);
                         connectButton.setText("Error - " + e.getMessage());
+
+                        // hide live indicator
+                        liveIndicator.setVisibility(View.GONE);
+
+                        // pause pikachu on error
+                        pausePikachu();
                     }
                 });
             }
         }
+
+    /**
+     * Start Pikachu Animation
+    */
+    private void startPikachu() {
+        GifDrawable gifDrawablePikachu;
+        GifImageView pikachuImageView = findViewById(R.id.pikachu);
+        try {
+            gifDrawablePikachu = new GifDrawable(getResources(), R.drawable.pikachu);
+            pikachuImageView.setImageDrawable(gifDrawablePikachu);
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+    }
+
+    /**
+     * Pause Pikachu Animation
+    */
+    private void pausePikachu() {
+        GifDrawable gifDrawablePikachu;
+        GifImageView pikachuImageView = findViewById(R.id.pikachu);
+        try {
+            gifDrawablePikachu = new GifDrawable(getResources(), R.drawable.pikachu);
+            gifDrawablePikachu.pause();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+    }
+
+    /**
+     * Start Pikachu Animation
+    */
+    private void dancePikachu() {
+        GifDrawable gifDrawablePikachu;
+        GifImageView pikachuImageView = findViewById(R.id.pikachu);
+        try {
+            gifDrawablePikachu = new GifDrawable(getResources(), R.drawable.pikachudance);
+            pikachuImageView.setImageDrawable(gifDrawablePikachu);
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+    }
 
     /**
      * Play a song based on certain parameters.
@@ -496,10 +636,14 @@ public class MainActivity extends AppCompatActivity {
 
                 // show new calm gif on resume
                 GifDrawable gifDrawable;
+                GifDrawable gifDrawablePikachu;
                 GifImageView imageView = findViewById(R.id.backdrop);
+                GifImageView pikachuImageView = findViewById(R.id.pikachu);
                 try {
                     gifDrawable = new GifDrawable( getResources(), chooseCalmBackdrop() );
                     imageView.setImageDrawable(gifDrawable);
+                    gifDrawablePikachu = new GifDrawable(getResources(), R.drawable.pikachu);
+                    pikachuImageView.setImageDrawable(gifDrawablePikachu);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -669,10 +813,10 @@ public class MainActivity extends AppCompatActivity {
     private void chooseCalmMusic() {
         // Calm Music Source https://www.youtube.com/watch?v=jrTMMG0zJyI
         String path1 = "calm.mp3";
-        float volume = 0.20f;
+        float volume = 0.50f;
 
         Random random = new Random();
-        int bound = 19;
+        int bound = 20;
         int number = random.nextInt(bound);
 
         // if track was same as the last, try to pick another
@@ -744,6 +888,9 @@ public class MainActivity extends AppCompatActivity {
             case 19 :
                 playSong("calm7.mp3", volume, 0);
                 break;
+            case 20 :
+                playSong("calm8.mp3", volume, 0);
+                break;
         }
     }
 
@@ -754,7 +901,7 @@ public class MainActivity extends AppCompatActivity {
         float volume = 1.0f;
 
         Random random = new Random();
-        int bound = 3;
+        int bound = 11;
         int number = random.nextInt(bound);
 
         // if track was same as the last, try to pick another
@@ -778,24 +925,30 @@ public class MainActivity extends AppCompatActivity {
             case 2 :
                 playSong("looka_bomba.mp3", volume, 261100);
                 break;
-//            case 3 :
-//                playSong("rider_of_the_sky.mp3", volume, 281200);
-//                break;
-//            case 4 :
-//                playSong("night_of_fire.mp3", volume, 277800);
-//                break;
-//            case 5 :
-//                playSong("back_on_the_rocks.mp3", volume, 260900);
-//                break;
-//            case 6 :
-//                playSong("the_top.mp3", volume, 203400);
-//                break;
-//            case 3 :
-//                playSong("gas_gas_gas.mp3", volume, 241200);
-//                break;
-//            case 6 :
-//                playSong("rockin_hardcore.mp3", volume, 251400);
-//                break;
+            case 4 :
+                playSong("rider_of_the_sky.mp3", volume, 281200);
+                break;
+            case 5 :
+                playSong("night_of_fire.mp3", volume, 277800);
+                break;
+            case 6 :
+                playSong("back_on_the_rocks.mp3", volume, 260900);
+                break;
+            case 7 :
+                playSong("gas_gas_gas.mp3", volume, 241200);
+                break;
+            case 8 :
+                playSong("king_of_the_world.mp3", volume, 250400);
+                break;
+            case 9 :
+                playSong("let_it_burn.mp3", volume, 207600);
+                break;
+            case 10 :
+                playSong("dont_turn_it_off.mp3", volume, 275600);
+                break;
+            case 11 :
+                playSong("beat_of_the_rising_sun.mp3", volume, 186800);
+                break;
             default :
                 playSong("looka_bomba.mp3", volume, 261100);
                 break;
