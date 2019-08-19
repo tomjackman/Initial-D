@@ -48,35 +48,39 @@
         android:textSize="50sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.332"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/connect_button2" />
 
-    <pl.droidsonroids.gif.GifImageView
-        android:id="@+id/pikachu"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:adjustViewBounds="true"
-        android:cropToPadding="true"
-        android:scaleType="fitXY"
-        android:src="@drawable/pikachu"
-        app:layout_constraintBottom_toTopOf="@+id/parameters2"
-        app:layout_constraintEnd_toEndOf="@+id/fullscreen_content" />
+    <ImageView
+        android:id="@+id/hondaPower"
+        android:layout_width="800dp"
+        android:layout_height="816dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.492"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.501"
+        app:srcCompat="@drawable/power" />
 
-    <pl.droidsonroids.gif.GifImageView
-        android:id="@+id/connectedIndicator"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_marginBottom="12dp"
-        android:layout_marginStart="8dp"
-        android:adjustViewBounds="true"
-        android:cropToPadding="true"
-        android:scaleType="fitXY"
-        android:src="@drawable/japan_map"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/parameters2"
-        app:layout_constraintStart_toStartOf="@+id/fullscreen_content" />
+    <TextView
+        android:id="@+id/mode"
+        android:layout_width="136dp"
+        android:layout_height="47dp"
+        android:layout_marginBottom="48dp"
+        android:layout_marginStart="592dp"
+        android:fontFamily="monospace"
+        android:gravity="center"
+        android:keepScreenOn="true"
+        android:text="Mode 01"
+        android:textAlignment="center"
+        android:textAllCaps="false"
+        android:textColor="@color/colorWhite"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/frameLayout2"
+        app:layout_constraintStart_toStartOf="@+id/frameLayout2" />
 
     <LinearLayout
         android:id="@+id/parameters"
@@ -84,7 +88,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center_horizontal"
-        android:background="@color/black_overlay"
         android:orientation="horizontal"
         tools:ignore="UselessParent"
         tools:layout_editor_absoluteX="48dp"
@@ -97,9 +100,9 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@color/black_overlay"
-            android:textSize="35sp"
             android:drawableLeft="@drawable/rpm"
-            android:textColor="@android:color/background_light" />
+            android:textColor="@android:color/background_light"
+            android:textSize="20sp" />
 
         <Button
             android:id="@+id/speedValue"
@@ -108,60 +111,10 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@color/black_overlay"
-            android:text=""
-            android:textSize="35sp"
             android:drawableLeft="@drawable/speed"
-            android:textColor="@android:color/background_light" />
-
-        <Button
-            android:id="@+id/coolantValue"
-            style="?metaButtonBarButtonStyle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@color/black_overlay"
             android:text=""
-            android:textSize="35sp"
-            android:drawableLeft="@drawable/coolant"
-            android:textColor="@android:color/background_light" />
-
-        <Button
-            android:id="@+id/throttleValue"
-            style="?metaButtonBarButtonStyle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@color/black_overlay"
-            android:text=""
-            android:textSize="35sp"
-            android:drawableLeft="@drawable/throttle"
-            android:textColor="@android:color/background_light" />
-
-        <Button
-            android:id="@+id/oilValue"
-            style="?metaButtonBarButtonStyle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@color/black_overlay"
-            android:text=""
-            android:textSize="35sp"
-            android:drawableLeft="@drawable/oil"
-            android:textColor="@android:color/background_light" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/parameters2"
-        style="?metaButtonBarStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
-        android:background="@color/black_overlay"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        tools:ignore="UselessParent"
-        tools:layout_editor_absoluteX="0dp">
+            android:textColor="@android:color/background_light"
+            android:textSize="20sp" />
 
         <Button
             android:id="@+id/intakeManifoldValue"
@@ -172,19 +125,19 @@
             android:background="@color/black_overlay"
             android:drawableLeft="@drawable/manifold"
             android:textColor="@android:color/background_light"
-            android:textSize="35sp" />
+            android:textSize="20sp" />
 
         <Button
-            android:id="@+id/fuelPressureValue"
+            android:id="@+id/throttleValue"
             style="?metaButtonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@color/black_overlay"
-            android:drawableLeft="@drawable/fuelpressure"
+            android:drawableLeft="@drawable/throttle"
             android:text=""
             android:textColor="@android:color/background_light"
-            android:textSize="35sp" />
+            android:textSize="20sp" />
 
         <Button
             android:id="@+id/intakeAirTempValue"
@@ -196,31 +149,32 @@
             android:drawableLeft="@drawable/airintake"
             android:text=""
             android:textColor="@android:color/background_light"
-            android:textSize="35sp" />
+            android:textSize="20sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/parameters2"
+        style="?metaButtonBarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:ignore="UselessParent"
+        tools:layout_editor_absoluteX="0dp">
 
         <Button
-            android:id="@+id/moduleVoltageValue"
+            android:id="@+id/vtec"
             style="?metaButtonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@color/black_overlay"
-            android:drawableLeft="@drawable/voltage"
-            android:text=""
+            android:drawableLeft="@drawable/honda"
+            android:text="DOHC i-VTEC Disengaged"
             android:textColor="@android:color/background_light"
-            android:textSize="35sp" />
-
-        <Button
-            android:id="@+id/fuelLevelValue"
-            style="?metaButtonBarButtonStyle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@color/black_overlay"
-            android:drawableLeft="@drawable/fuellevel"
-            android:text=""
-            android:textColor="@android:color/background_light"
-            android:textSize="35sp" />
+            android:textSize="20sp" />
 
     </LinearLayout>
 
@@ -228,7 +182,6 @@
         android:id="@+id/frameLayout2"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@color/black_overlay"
         android:fitsSystemWindows="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -251,7 +204,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|center_horizontal"
-            android:background="@color/black_overlay"
             android:orientation="horizontal"
             tools:ignore="UselessParent">
 

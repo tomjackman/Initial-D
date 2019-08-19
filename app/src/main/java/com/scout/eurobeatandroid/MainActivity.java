@@ -18,6 +18,7 @@ import android.view.animation.Animation;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -74,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
     private int lastCalmTrack;
     private int lastEuroBeatBackdrop;
     private int lastCalmBackdrop;
+    private int mode;
 
     /**
      * Whether or not the system UI should be auto-hidden after
@@ -165,6 +167,9 @@ public class MainActivity extends AppCompatActivity {
         lastEuroBeatBackdrop = 0;
         lastCalmBackdrop = 0;
 
+        // initialise the mode
+        mode = 1;
+
         // bluetooth adapter
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -177,9 +182,6 @@ public class MainActivity extends AppCompatActivity {
 
         // choose calm backdrop on start
         chooseRandomBackdrop();
-
-        // make pikachu paused on start
-        pausePikachu();
 
         // change backdrop every 30 seconds
         final Handler handler = new Handler();
@@ -219,6 +221,22 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // Switch to a new track when vtec is tapped
+        findViewById(R.id.vtec).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                switchTrack();
+            }
+        });
+
+        // Cahnge mode when the mode is tapped
+        findViewById(R.id.mode).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                changeMode();
+            }
+        });
+
         findViewById(R.id.backdrop).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -245,7 +263,6 @@ public class MainActivity extends AppCompatActivity {
                     findViewById(R.id.connect_button).setBackgroundColor(getResources().getColor(R.color.colorPositive));
                     Button connectButton = findViewById(R.id.connect_button);
                     connectButton.setText("Connected to " + device.getName());
-                    startPikachu();
                 }});
 
                 try {
@@ -419,7 +436,6 @@ public class MainActivity extends AppCompatActivity {
      * Monitor the vehicle RPM and Throttle %.
      */
     private void monitorParameters() {
-            final GifImageView liveIndicator = findViewById(R.id.connectedIndicator);
 
             try {
                 BluetoothSocket socket = bluetooth.getSocket();
@@ -432,10 +448,13 @@ public class MainActivity extends AppCompatActivity {
                 SpeedCommand speedCommand = new SpeedCommand();
                 speedCommand.run(socket.getInputStream(), socket.getOutputStream());
                 final String speedResult = speedCommand.getFormattedResult();
+                final float speed = speedCommand.getMetricSpeed();
+               // final String speedResult = "N/A";
 
-                EngineCoolantTemperatureCommand coolantCommand = new EngineCoolantTemperatureCommand();
-                coolantCommand.run(socket.getInputStream(), socket.getOutputStream());
-                final String coolantResult = coolantCommand.getFormattedResult();
+//                EngineCoolantTemperatureCommand coolantCommand = new EngineCoolantTemperatureCommand();
+//                coolantCommand.run(socket.getInputStream(), socket.getOutputStream());
+//                final String coolantResult = coolantCommand.getFormattedResult();
+                final String coolantResult = "N/A";
 
                 ThrottlePositionCommand throttlePositionCommand = new ThrottlePositionCommand();
                 throttlePositionCommand.run(socket.getInputStream(), socket.getOutputStream());
@@ -447,20 +466,20 @@ public class MainActivity extends AppCompatActivity {
 //                final String oilTempResult = oilTempCommand.getFormattedResult();
                 final String oilTempResult = "N/A";
 
-//                IntakeManifoldPressureCommand intakeManifoldPressureCommand = new IntakeManifoldPressureCommand();
-//                intakeManifoldPressureCommand.run(socket.getInputStream(), socket.getOutputStream());
-//                final String intakeManifoldPressureResult = intakeManifoldPressureCommand.getFormattedResult();
-                final String intakeManifoldPressureResult = "N/A";
+                IntakeManifoldPressureCommand intakeManifoldPressureCommand = new IntakeManifoldPressureCommand();
+                intakeManifoldPressureCommand.run(socket.getInputStream(), socket.getOutputStream());
+                final String intakeManifoldPressureResult = intakeManifoldPressureCommand.getFormattedResult();
+//                final String intakeManifoldPressureResult = "N/A";
 
 //                FuelPressureCommand fuelPressureCommand = new FuelPressureCommand();
 //                fuelPressureCommand.run(socket.getInputStream(), socket.getOutputStream());
 //                final String fuelPressureResult = fuelPressureCommand.getFormattedResult();
                 final String fuelPressureResult = "N/A";
 
-//                AirIntakeTemperatureCommand airIntakeTemperatureCommand = new AirIntakeTemperatureCommand();
-//                airIntakeTemperatureCommand.run(socket.getInputStream(), socket.getOutputStream());
-//                final String airIntakeTemperatureResult = airIntakeTemperatureCommand.getFormattedResult();
-                final String airIntakeTemperatureResult = "N/A";
+                AirIntakeTemperatureCommand airIntakeTemperatureCommand = new AirIntakeTemperatureCommand();
+                airIntakeTemperatureCommand.run(socket.getInputStream(), socket.getOutputStream());
+                final String airIntakeTemperatureResult = airIntakeTemperatureCommand.getFormattedResult();
+//                final String airIntakeTemperatureResult = "N/A";
 
 //                ModuleVoltageCommand moduleVoltageCommand = new ModuleVoltageCommand();
 //                moduleVoltageCommand.run(socket.getInputStream(), socket.getOutputStream());
@@ -475,43 +494,56 @@ public class MainActivity extends AppCompatActivity {
                 // show RPM on display
                 runOnUiThread(new Runnable() {
                     public void run() {
+
                         // update live values
                         TextView rpmText = findViewById(R.id.rpmValue);
                         rpmText.setText(rpmResult);
 
+                        if (rpm > 7500) {
+                            rpmText.setTextColor(getResources().getColor(R.color.red));
+                        } else {
+                            rpmText.setTextColor(getResources().getColor(R.color.colorWhite));
+                        }
+
                         TextView speedText = findViewById(R.id.speedValue);
                         speedText.setText(speedResult);
 
-                        TextView coolantText = findViewById(R.id.coolantValue);
-                        coolantText.setText(coolantResult);
+                        if (speed > 90) {
+                            speedText.setTextColor(getResources().getColor(R.color.red));
+                        } else {
+                            speedText.setTextColor(getResources().getColor(R.color.colorWhite));
+                        }
+
 
                         TextView throttleText = findViewById(R.id.throttleValue);
                         throttleText.setText(thottlePositionResult);
 
-                        TextView oilText = findViewById(R.id.oilValue);
-                        oilText.setText(oilTempResult);
+                        if (throttle > 70) {
+                            throttleText.setTextColor(getResources().getColor(R.color.red));
+                        } else {
+                            throttleText.setTextColor(getResources().getColor(R.color.colorWhite));
+                        }
 
                         TextView intakeManifoldText = findViewById(R.id.intakeManifoldValue);
                         intakeManifoldText.setText(intakeManifoldPressureResult);
 
-                        TextView fuelPressureText = findViewById(R.id.fuelPressureValue);
-                        fuelPressureText.setText(fuelPressureResult);
-
                         TextView intakeAirTempText = findViewById(R.id.intakeAirTempValue);
                         intakeAirTempText.setText(airIntakeTemperatureResult);
 
-                        TextView moduleVoltageText = findViewById(R.id.moduleVoltageValue);
-                        moduleVoltageText.setText(moduleVoltageResult);
+                        TextView vtecText = findViewById(R.id.vtec);
+                        vtecText.setText("DOHC i-VTEC Disengaged");
 
-                        TextView fuelLevelText = findViewById(R.id.fuelLevelValue);
-                        fuelLevelText.setText(fuelLevelResult);
-
-                        // show live indicator
-                        liveIndicator.setVisibility(View.VISIBLE);
+                        if (rpm > 6000) {
+                            vtecText.setText("DOHC i-VTEC Engaged");
+                            vtecText.setBackgroundColor(getResources().getColor(R.color.red));
+                        } else {
+                            vtecText.setText("DOHC i-VTEC Disengaged");
+                            vtecText.setBackgroundColor(getResources().getColor(R.color.black_overlay));
+                        }
                     }
                 });
 
-                if ((rpm > 5000 || throttle > 70) && !euroBeatPlaying) {
+                if (throttle > 90 && !euroBeatPlaying && mode == 3) {
                     // choose euro beat song
                     chooseEuroBeatMusic();
 
@@ -523,9 +555,6 @@ public class MainActivity extends AppCompatActivity {
                             try {
                                 gifDrawable = new GifDrawable(getResources(), chooseEuroBeatBackdrop());
                                 imageView.setImageDrawable(gifDrawable);
-
-                                // make pikachu dance
-                                dancePikachu();
 
                             } catch (IOException e) {
                                 e.printStackTrace();
@@ -539,61 +568,62 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     public void run() {
                         // update bluetooth connect button to show error
-                        show();
                         findViewById(R.id.connect_button).setBackgroundColor(getResources().getColor(R.color.colorAccent));
                         Button connectButton = findViewById(R.id.connect_button);
                         connectButton.setText("Error - " + e.getMessage());
-
-                        // hide live indicator
-                        liveIndicator.setVisibility(View.GONE);
-
-                        // pause pikachu on error
-                        pausePikachu();
                     }
                 });
             }
         }
 
     /**
-     * Start Pikachu Animation
-    */
-    private void startPikachu() {
-        GifDrawable gifDrawablePikachu;
-        GifImageView pikachuImageView = findViewById(R.id.pikachu);
-        try {
-            gifDrawablePikachu = new GifDrawable(getResources(), R.drawable.pikachu);
-            pikachuImageView.setImageDrawable(gifDrawablePikachu);
-        } catch (IOException e1) {
-            e1.printStackTrace();
+     * Switch to the next track
+     */
+    private void switchTrack() {
+        mediaPlayer.stop();
+        mediaPlayer.reset();
+        euroBeatPlaying = false;
+
+        if (mode == 2) {
+            chooseFullEurobeatMusic();
+        } else {
+            chooseCalmMusic();
         }
     }
 
     /**
-     * Pause Pikachu Animation
-    */
-    private void pausePikachu() {
-        GifDrawable gifDrawablePikachu;
-        GifImageView pikachuImageView = findViewById(R.id.pikachu);
-        try {
-            gifDrawablePikachu = new GifDrawable(getResources(), R.drawable.pikachu);
-            gifDrawablePikachu.pause();
-        } catch (IOException e1) {
-            e1.printStackTrace();
-        }
-    }
+     * Change the mode
+     */
+    private void changeMode() {
+        TextView modeText = findViewById(R.id.mode);
+        ImageView hondaPower = findViewById(R.id.hondaPower);
 
-    /**
-     * Start Pikachu Animation
-    */
-    private void dancePikachu() {
-        GifDrawable gifDrawablePikachu;
-        GifImageView pikachuImageView = findViewById(R.id.pikachu);
-        try {
-            gifDrawablePikachu = new GifDrawable(getResources(), R.drawable.pikachudance);
-            pikachuImageView.setImageDrawable(gifDrawablePikachu);
-        } catch (IOException e1) {
-            e1.printStackTrace();
+        // change the music
+        mediaPlayer.stop();
+        mediaPlayer.reset();
+        euroBeatPlaying = false;
+
+        if (mode == 1) {
+            mode = 2;
+            hondaPower.setImageResource(R.drawable.power2);
+            chooseFullEurobeatMusic();
+        } else if (mode == 2) {
+            mode = 3;
+            hondaPower.setVisibility(View.GONE);
+            chooseCalmMusic();
+        } else if (mode == 3) {
+            mode = 1;
+            hondaPower.setVisibility(View.VISIBLE);
+            hondaPower.setImageResource(R.drawable.power);
+            chooseCalmMusic();
         }
+
+        // update mode text
+        modeText.setText("Mode 0" + mode);
+
+
+
+
     }
 
     /**
@@ -628,24 +658,28 @@ public class MainActivity extends AppCompatActivity {
         // returns to playing calm music
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             public void onCompletion(MediaPlayer mediaPlayer) {
-                // play calm music
-                chooseCalmMusic();
 
-                // set euro beat indicator off
-                euroBeatPlaying = false;
+                if (mode == 1) {
+                    // play calm music
+                    chooseCalmMusic();
+                } else if (mode == 2) {
+                    chooseFullEurobeatMusic();
+                } else {
+                    // play calm music
+                    chooseCalmMusic();
 
-                // show new calm gif on resume
-                GifDrawable gifDrawable;
-                GifDrawable gifDrawablePikachu;
-                GifImageView imageView = findViewById(R.id.backdrop);
-                GifImageView pikachuImageView = findViewById(R.id.pikachu);
-                try {
-                    gifDrawable = new GifDrawable( getResources(), chooseCalmBackdrop() );
-                    imageView.setImageDrawable(gifDrawable);
-                    gifDrawablePikachu = new GifDrawable(getResources(), R.drawable.pikachu);
-                    pikachuImageView.setImageDrawable(gifDrawablePikachu);
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    // set euro beat indicator off
+                    euroBeatPlaying = false;
+
+                    // show new calm gif on resume
+                    GifDrawable gifDrawable;
+                    GifImageView imageView = findViewById(R.id.backdrop);
+                    try {
+                        gifDrawable = new GifDrawable( getResources(), chooseCalmBackdrop() );
+                        imageView.setImageDrawable(gifDrawable);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
@@ -816,7 +850,7 @@ public class MainActivity extends AppCompatActivity {
         float volume = 0.50f;
 
         Random random = new Random();
-        int bound = 20;
+        int bound = 32;
         int number = random.nextInt(bound);
 
         // if track was same as the last, try to pick another
@@ -891,6 +925,42 @@ public class MainActivity extends AppCompatActivity {
             case 20 :
                 playSong("calm8.mp3", volume, 0);
                 break;
+            case 21 :
+                playSong("calm9.mp3", volume, 7000);
+                break;
+            case 22 :
+                playSong("calm10.mp3", volume, 0);
+                break;
+            case 23 :
+                playSong("calm11.mp3", volume, 0);
+                break;
+            case 24 :
+                playSong("calm12.mp3", volume, 0);
+                break;
+            case 25 :
+                playSong("calm13.mp3", volume, 0);
+                break;
+            case 26 :
+                playSong("calm14.mp3", volume, 0);
+                break;
+            case 27 :
+                playSong("calm15.mp3", volume, 0);
+                break;
+            case 28 :
+                playSong("calm16.mp3", volume, 0);
+                break;
+            case 29 :
+                playSong("calm17.mp3", volume, 0);
+                break;
+            case 30 :
+                playSong("calm18.mp3", volume, 0);
+                break;
+            case 31 :
+                playSong("calm19.mp3", volume, 0);
+                break;
+            case 32 :
+                playSong("calm20.mp3", volume, 0);
+                break;
         }
     }
 
@@ -901,7 +971,7 @@ public class MainActivity extends AppCompatActivity {
         float volume = 1.0f;
 
         Random random = new Random();
-        int bound = 11;
+        int bound = 4;
         int number = random.nextInt(bound);
 
         // if track was same as the last, try to pick another
@@ -919,38 +989,102 @@ public class MainActivity extends AppCompatActivity {
             case 0 :
                 playSong("deja_vu.mp3", volume, 209400);
                 break;
+//            case 1 :
+//                playSong("running_in_the_90s.mp3", volume, 207000);
+//                break;
             case 1 :
-                playSong("running_in_the_90s.mp3", volume, 207000);
-                break;
-            case 2 :
                 playSong("looka_bomba.mp3", volume, 261100);
                 break;
-            case 4 :
-                playSong("rider_of_the_sky.mp3", volume, 281200);
-                break;
-            case 5 :
+//            case 4 :
+//                playSong("rider_of_the_sky.mp3", volume, 281200);
+//                break;
+            case 2 :
                 playSong("night_of_fire.mp3", volume, 277800);
                 break;
-            case 6 :
-                playSong("back_on_the_rocks.mp3", volume, 260900);
-                break;
-            case 7 :
-                playSong("gas_gas_gas.mp3", volume, 241200);
-                break;
-            case 8 :
-                playSong("king_of_the_world.mp3", volume, 250400);
-                break;
-            case 9 :
+//            case 6 :
+//                playSong("back_on_the_rocks.mp3", volume, 260900);
+//                break;
+//            case 7 :
+//                playSong("gas_gas_gas.mp3", volume, 241200);
+//                break;
+//            case 3 :
+//                playSong("king_of_the_world.mp3", volume, 250400);
+//                break;
+            case 3 :
                 playSong("let_it_burn.mp3", volume, 207600);
                 break;
-            case 10 :
-                playSong("dont_turn_it_off.mp3", volume, 275600);
-                break;
-            case 11 :
+//            case 10 :
+//                playSong("dont_turn_it_off.mp3", volume, 275600);
+//                break;
+            case 4 :
                 playSong("beat_of_the_rising_sun.mp3", volume, 186800);
                 break;
             default :
                 playSong("looka_bomba.mp3", volume, 261100);
+                break;
+        }
+    }
+
+    /**
+     * Choose a full eurobeat track.
+     */
+    private void chooseFullEurobeatMusic() {
+        float volume = 0.50f;
+
+        Random random = new Random();
+        int bound = 12;
+        int number = random.nextInt(bound);
+
+        // if track was same as the last, try to pick another
+        if (number == lastEuroBeatTrack) {
+            number = random.nextInt(bound);
+        }
+
+        // update the track id
+        lastEuroBeatTrack = number;
+
+        switch(number){
+            case 0 :
+                playSong("deja_vu.mp3", volume, 0);
+                break;
+            case 1 :
+                playSong("running_in_the_90s.mp3", volume, 0);
+                break;
+            case 2 :
+                playSong("looka_bomba.mp3", volume, 0);
+                break;
+            case 3 :
+                playSong("rider_of_the_sky.mp3", volume, 0);
+                break;
+            case 4 :
+                playSong("night_of_fire.mp3", volume, 0);
+                break;
+            case 5 :
+                playSong("back_on_the_rocks.mp3", volume, 0);
+                break;
+            case 6:
+                playSong("gas_gas_gas.mp3", volume, 0);
+                break;
+            case 7 :
+                playSong("king_of_the_world.mp3", volume, 0);
+                break;
+            case 8 :
+                playSong("let_it_burn.mp3", volume, 0);
+                break;
+            case 9 :
+                playSong("dont_turn_it_off.mp3", volume, 0);
+                break;
+            case 10:
+                playSong("beat_of_the_rising_sun.mp3", volume, 0);
+                break;
+            case 11:
+                playSong("around_the_world.mp3", volume, 0);
+                break;
+            case 12:
+                playSong("break_in2_the_nite.mp3", volume, 0);
+                break;
+            default :
+                playSong("looka_bomba.mp3", volume, 0);
                 break;
         }
     }
