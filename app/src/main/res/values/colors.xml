@@ -6,6 +6,6 @@
     <color name="red">#FF0000 </color>
     <color name="colorPositive">#26c43b</color>
     <color name="colorWhite">#fff</color>
-    <color name="black_overlay">#b7000000</color>
+    <color name="black_overlay">#87000000</color>
     <color name="transparent">#00000000</color>
 </resources>

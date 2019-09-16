@@ -18,7 +18,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:background="#1c5a76"
+        android:background="#000000"
         android:text="@string/connect_button"
         android:textColor="@android:color/background_light" />
 
@@ -77,9 +77,47 @@
         android:textAlignment="center"
         android:textAllCaps="false"
         android:textColor="@color/colorWhite"
-        android:textSize="30sp"
+        android:textSize="28sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/frameLayout2"
+        app:layout_constraintStart_toStartOf="@+id/frameLayout2" />
+
+    <TextView
+        android:id="@+id/time"
+        android:layout_width="151dp"
+        android:layout_height="47dp"
+        android:layout_marginBottom="48dp"
+        android:layout_marginStart="4dp"
+        android:fontFamily="monospace"
+        android:gravity="center"
+        android:keepScreenOn="true"
+        android:text="Time"
+        android:textAlignment="center"
+        android:textAllCaps="false"
+        android:textColor="@color/colorWhite"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/frameLayout2"
+        app:layout_constraintStart_toStartOf="@+id/frameLayout2" />
+
+    <TextView
+        android:id="@+id/speedChime"
+        android:layout_width="169dp"
+        android:layout_height="47dp"
+        android:layout_marginBottom="48dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:fontFamily="monospace"
+        android:gravity="center"
+        android:keepScreenOn="true"
+        android:text="86 Chime"
+        android:textAlignment="center"
+        android:textAllCaps="false"
+        android:textColor="@color/colorWhite"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/frameLayout2"
+        app:layout_constraintEnd_toEndOf="@+id/frameLayout2"
         app:layout_constraintStart_toStartOf="@+id/frameLayout2" />
 
     <LinearLayout
@@ -213,7 +251,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="#1c5a76"
+                android:background="#ff0000"
                 android:text="@string/connect_button"
                 android:textColor="@android:color/background_light" />
 
