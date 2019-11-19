@@ -27,7 +27,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:scaleType="fitXY"
-        android:src="@drawable/backdrop1"
+        android:src="@drawable/street1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -54,71 +54,11 @@
 
     <ImageView
         android:id="@+id/hondaPower"
-        android:layout_width="800dp"
-        android:layout_height="816dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.492"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.501"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:scaleType="centerCrop"
+        android:adjustViewBounds="true"
         app:srcCompat="@drawable/power" />
-
-    <TextView
-        android:id="@+id/mode"
-        android:layout_width="136dp"
-        android:layout_height="47dp"
-        android:layout_marginBottom="48dp"
-        android:layout_marginStart="592dp"
-        android:fontFamily="monospace"
-        android:gravity="center"
-        android:keepScreenOn="true"
-        android:text="Mode 01"
-        android:textAlignment="center"
-        android:textAllCaps="false"
-        android:textColor="@color/colorWhite"
-        android:textSize="28sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/frameLayout2"
-        app:layout_constraintStart_toStartOf="@+id/frameLayout2" />
-
-    <TextView
-        android:id="@+id/time"
-        android:layout_width="151dp"
-        android:layout_height="47dp"
-        android:layout_marginBottom="48dp"
-        android:layout_marginStart="4dp"
-        android:fontFamily="monospace"
-        android:gravity="center"
-        android:keepScreenOn="true"
-        android:text="Time"
-        android:textAlignment="center"
-        android:textAllCaps="false"
-        android:textColor="@color/colorWhite"
-        android:textSize="28sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/frameLayout2"
-        app:layout_constraintStart_toStartOf="@+id/frameLayout2" />
-
-    <TextView
-        android:id="@+id/speedChime"
-        android:layout_width="169dp"
-        android:layout_height="47dp"
-        android:layout_marginBottom="48dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:fontFamily="monospace"
-        android:gravity="center"
-        android:keepScreenOn="true"
-        android:text="86 Chime"
-        android:textAlignment="center"
-        android:textAllCaps="false"
-        android:textColor="@color/colorWhite"
-        android:textSize="28sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/frameLayout2"
-        app:layout_constraintEnd_toEndOf="@+id/frameLayout2"
-        app:layout_constraintStart_toStartOf="@+id/frameLayout2" />
 
     <LinearLayout
         android:id="@+id/parameters"
@@ -140,6 +80,7 @@
             android:background="@color/black_overlay"
             android:drawableLeft="@drawable/rpm"
             android:textColor="@android:color/background_light"
+            android:text="0 RPM"
             android:textSize="20sp" />
 
         <Button
@@ -150,7 +91,7 @@
             android:layout_weight="1"
             android:background="@color/black_overlay"
             android:drawableLeft="@drawable/speed"
-            android:text=""
+            android:text="0 KM/H"
             android:textColor="@android:color/background_light"
             android:textSize="20sp" />
 
@@ -163,6 +104,7 @@
             android:background="@color/black_overlay"
             android:drawableLeft="@drawable/manifold"
             android:textColor="@android:color/background_light"
+            android:text="0 Kpa"
             android:textSize="20sp" />
 
         <Button
@@ -173,7 +115,7 @@
             android:layout_weight="1"
             android:background="@color/black_overlay"
             android:drawableLeft="@drawable/throttle"
-            android:text=""
+            android:text="0%"
             android:textColor="@android:color/background_light"
             android:textSize="20sp" />
 
@@ -185,7 +127,7 @@
             android:layout_weight="1"
             android:background="@color/black_overlay"
             android:drawableLeft="@drawable/airintake"
-            android:text=""
+            android:text="0°"
             android:textColor="@android:color/background_light"
             android:textSize="20sp" />
 
@@ -195,11 +137,12 @@
         android:id="@+id/parameters2"
         style="?metaButtonBarStyle"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="53dp"
         android:layout_gravity="bottom|center_horizontal"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         tools:ignore="UselessParent"
+        android:background="@color/black_overlay"
         tools:layout_editor_absoluteX="0dp">
 
         <Button
@@ -208,11 +151,69 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@color/black_overlay"
             android:drawableLeft="@drawable/honda"
-            android:text="DOHC i-VTEC Disengaged"
+            android:text="VTEC"
             android:textColor="@android:color/background_light"
             android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/time"
+            android:layout_width="0dp"
+            android:layout_height="47dp"
+            android:layout_marginBottom="48dp"
+            android:layout_marginStart="4dp"
+            android:layout_weight="1"
+            android:fontFamily="monospace"
+            android:gravity="center"
+            android:keepScreenOn="true"
+            android:text="Time"
+            android:textAlignment="center"
+            android:textAllCaps="false"
+            android:textColor="@color/colorWhite"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/frameLayout2"
+            app:layout_constraintStart_toStartOf="@+id/frameLayout2" />
+
+        <TextView
+            android:id="@+id/speedChime"
+            android:layout_width="0dp"
+            android:layout_height="47dp"
+            android:layout_marginBottom="48dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:fontFamily="monospace"
+            android:gravity="center"
+            android:keepScreenOn="true"
+            android:text="Tofu 86"
+            android:textAlignment="center"
+            android:textAllCaps="false"
+            android:textColor="@color/colorWhite"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/frameLayout2"
+            app:layout_constraintEnd_toEndOf="@+id/frameLayout2"
+            app:layout_constraintStart_toStartOf="@+id/frameLayout2" />
+
+        <TextView
+            android:id="@+id/mode"
+            android:layout_width="0dp"
+            android:layout_height="47dp"
+            android:layout_marginBottom="52dp"
+            android:layout_marginEnd="16dp"
+            android:layout_weight="1"
+            android:fontFamily="monospace"
+            android:gravity="center"
+            android:keepScreenOn="true"
+            android:text="Mode $01"
+            android:textAlignment="center"
+            android:textAllCaps="false"
+            android:textColor="@color/colorWhite"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/frameLayout2"
+            app:layout_constraintEnd_toEndOf="@+id/frameLayout2" />
 
     </LinearLayout>
 

@@ -6,7 +6,6 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
-import android.icu.util.Calendar;
 import android.media.MediaPlayer;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -27,19 +26,17 @@ import com.github.pires.obd.commands.SpeedCommand;
 import com.github.pires.obd.commands.engine.RPMCommand;
 import com.github.pires.obd.commands.engine.ThrottlePositionCommand;
 import com.github.pires.obd.commands.pressure.IntakeManifoldPressureCommand;
+import com.github.pires.obd.commands.protocol.AdaptiveTimingCommand;
 import com.github.pires.obd.commands.protocol.EchoOffCommand;
 import com.github.pires.obd.commands.protocol.HeadersOffCommand;
 import com.github.pires.obd.commands.protocol.LineFeedOffCommand;
 import com.github.pires.obd.commands.protocol.SelectProtocolCommand;
 import com.github.pires.obd.commands.protocol.SpacesOffCommand;
-import com.github.pires.obd.commands.protocol.TimeoutCommand;
 import com.github.pires.obd.commands.temperature.AirIntakeTemperatureCommand;
 import com.github.pires.obd.enums.ObdProtocols;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -68,6 +65,16 @@ public class MainActivity extends AppCompatActivity {
     private ListView bluetoothPairedList;
     private boolean euroBeatPlaying;
     private boolean speedChimePlaying;
+
+    // -------- vehicle spec -----------
+    private final int ACCORD_CL7_EUROR_TRIGGER = 90;
+    private final int S2000_TRIGGER = 87;
+    private int THROTTLE_TRIGGER_PERCENTAGE = S2000_TRIGGER;
+
+    private final int AE86_WARNING_SPEED_TRIGGER = 102;
+    private final int VTEC_RPM_TRIGGER = 5500;
+    private final String OBD_DEVICE_NAME = "OBDII";
+    // -------- vehicle spec -----------
 
     private int lastEuroBeatTrack;
     private int lastCalmTrack;
@@ -197,11 +204,6 @@ public class MainActivity extends AppCompatActivity {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-//                if (euroBeatPlaying) {
-//                    handler.postDelayed(this, 2500);
-//                } else {
-//                    handler.postDelayed(this, 8000);
-//                }
                 handler.postDelayed(this, 2000);
                 chooseRandomBackdrop();
             }
@@ -256,14 +258,14 @@ public class MainActivity extends AppCompatActivity {
                 chimeEnabled = !chimeEnabled;
 
                 if (chimeEnabled) {
-                    chimeText.setTextColor(getResources().getColor(R.color.colorWhite));
+                    chimeText.setBackgroundColor(getResources().getColor(R.color.transparent));
                 } else {
-                    chimeText.setTextColor(getResources().getColor(R.color.red));
+                    chimeText.setBackgroundColor(getResources().getColor(R.color.red));
                 }
             }
         });
 
-        // Cahnge mode when the mode is tapped
+        // Change mode when the mode is tapped
         findViewById(R.id.mode).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -305,9 +307,9 @@ public class MainActivity extends AppCompatActivity {
                     new LineFeedOffCommand().run(socket.getInputStream(), socket.getOutputStream());
                     new SpacesOffCommand().run(socket.getInputStream(), socket.getOutputStream());
                     new HeadersOffCommand().run(socket.getInputStream(), socket.getOutputStream());
-                    new TimeoutCommand(255).run(socket.getInputStream(), socket.getOutputStream());
-                    new SelectProtocolCommand(ObdProtocols.AUTO).run(socket.getInputStream(), socket.getOutputStream());
-
+                    new AdaptiveTimingCommand(2).run(socket.getInputStream(), socket.getOutputStream());
+                    //new TimeoutCommand(3).run(socket.getInputStream(), socket.getOutputStream());
+                    new SelectProtocolCommand(ObdProtocols.ISO_9141_2).run(socket.getInputStream(), socket.getOutputStream());
 
                     // poll the vehicle
                     while(bluetooth.isConnected()) {
@@ -348,7 +350,7 @@ public class MainActivity extends AppCompatActivity {
 
         // attempt to connect on app start if bluetooth enabled
         if (bluetooth.isEnabled()) {
-            connect("OBDII");
+            connect(OBD_DEVICE_NAME);
         }
     }
 
@@ -538,6 +540,7 @@ public class MainActivity extends AppCompatActivity {
                 AirIntakeTemperatureCommand airIntakeTemperatureCommand = new AirIntakeTemperatureCommand();
                 airIntakeTemperatureCommand.run(socket.getInputStream(), socket.getOutputStream());
                 final String airIntakeTemperatureResult = airIntakeTemperatureCommand.getFormattedResult();
+                final float airTemp = airIntakeTemperatureCommand.getTemperature();
 //                final String airIntakeTemperatureResult = "N/A";
 
 //                ModuleVoltageCommand moduleVoltageCommand = new ModuleVoltageCommand();
@@ -567,7 +570,7 @@ public class MainActivity extends AppCompatActivity {
                         TextView speedText = findViewById(R.id.speedValue);
                         speedText.setText(speedResult);
 
-                        if (speed > 90) {
+                        if (speed > 100) {
                             speedText.setTextColor(getResources().getColor(R.color.red));
                         } else {
                             speedText.setTextColor(getResources().getColor(R.color.colorWhite));
@@ -589,44 +592,53 @@ public class MainActivity extends AppCompatActivity {
                         TextView intakeAirTempText = findViewById(R.id.intakeAirTempValue);
                         intakeAirTempText.setText(airIntakeTemperatureResult);
 
-                        TextView vtecText = findViewById(R.id.vtec);
-                        vtecText.setText("DOHC i-VTEC Disengaged");
+                        if (airTemp < 10) {
+                            intakeAirTempText.setTextColor(getResources().getColor(R.color.lightBlue));
+                        } else if (airTemp < 15){
+                            intakeAirTempText.setTextColor(getResources().getColor(R.color.darkBlue));
+                        } else if (airTemp < 20){
+                            intakeAirTempText.setTextColor(getResources().getColor(R.color.green));
+                        } else {
+                            intakeAirTempText.setTextColor(getResources().getColor(R.color.red));
+                        }
 
-                        if (rpm > 6000) {
-                            vtecText.setText("DOHC i-VTEC Engaged");
+                        TextView vtecText = findViewById(R.id.vtec);
+                        vtecText.setText("VTEC");
+
+                        if (rpm > VTEC_RPM_TRIGGER) {
                             vtecText.setBackgroundColor(getResources().getColor(R.color.red));
                         } else {
-                            vtecText.setText("DOHC i-VTEC Disengaged");
-                            vtecText.setBackgroundColor(getResources().getColor(R.color.black_overlay));
+                            vtecText.setBackgroundColor(getResources().getColor(R.color.transparent));
                         }
                     }
                 });
 
                 // AE86 speed chime logic
-                if (speed > 102 && !speedChimePlaying && chimeEnabled && mode == 3) {
+                if (speed > AE86_WARNING_SPEED_TRIGGER && !speedChimePlaying && chimeEnabled && mode == 3) {
                     playSpeedChime();
                     speedChimePlaying = true;
                 }
 
                 // music trigger logic
-                if (throttle > 90 && !euroBeatPlaying && mode == 3) {
-                    // choose euro beat song
-                    chooseEuroBeatMusic();
+                if (throttle > THROTTLE_TRIGGER_PERCENTAGE && !euroBeatPlaying && mode == 3) {
 
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            // choose new euro beat gif
-                            GifDrawable gifDrawable;
-                            GifImageView imageView = findViewById(R.id.backdrop);
-                            try {
-                                gifDrawable = new GifDrawable(getResources(), chooseEuroBeatBackdrop());
-                                imageView.setImageDrawable(gifDrawable);
+                        // choose euro beat song
+                        chooseEuroBeatMusic();
 
-                            } catch (IOException e) {
-                                e.printStackTrace();
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                // choose new euro beat gif
+                                GifDrawable gifDrawable;
+                                GifImageView imageView = findViewById(R.id.backdrop);
+                                try {
+                                    gifDrawable = new GifDrawable(getResources(), chooseEuroBeatBackdrop());
+                                    imageView.setImageDrawable(gifDrawable);
+
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
                             }
-                        }
-                    });
+                        });
                 }
             } catch( final Exception e){
                 // handle errors
@@ -649,9 +661,27 @@ public class MainActivity extends AppCompatActivity {
         mediaPlayer.stop();
         mediaPlayer.reset();
         euroBeatPlaying = false;
+        ImageView hondaPower = findViewById(R.id.hondaPower);
 
         if (mode == 2) {
             chooseFullEurobeatMusic();
+            hondaPower.setImageResource(chooseCalmWallpaperBackdrop());
+        } else if (mode == 3) {
+            // play calm music
+            chooseCalmMusic();
+
+            // set euro beat indicator off
+            euroBeatPlaying = false;
+
+            // show new calm gif on resume
+            GifDrawable gifDrawable;
+            GifImageView imageView = findViewById(R.id.backdrop);
+            try {
+                gifDrawable = new GifDrawable( getResources(), chooseCalmBackdrop() );
+                imageView.setImageDrawable(gifDrawable);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         } else {
             chooseCalmMusic();
         }
@@ -734,13 +764,13 @@ public class MainActivity extends AppCompatActivity {
 
         if (mode == 1) {
             mode = 2;
-            hondaPower.setImageResource(R.drawable.power2);
+            hondaPower.setImageResource(chooseCalmWallpaperBackdrop());
             chooseFullEurobeatMusic();
         } else if (mode == 2) {
             mode = 3;
             hondaPower.setVisibility(View.GONE);
-            chooseCalmMusic();
             playCoolVibrations();
+            chooseCalmMusic();
         } else if (mode == 3) {
             mode = 1;
             hondaPower.setVisibility(View.VISIBLE);
@@ -749,12 +779,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // update mode text
-        modeText.setText("Mode 0" + mode);
-
-
-
-
-    }
+        modeText.setText("Mode $0" + mode);
+        }
 
     /**
      * Play a song based on certain parameters.
@@ -794,6 +820,8 @@ public class MainActivity extends AppCompatActivity {
                     chooseCalmMusic();
                 } else if (mode == 2) {
                     chooseFullEurobeatMusic();
+                    ImageView hondaPower = findViewById(R.id.hondaPower);
+                    hondaPower.setImageResource(chooseCalmWallpaperBackdrop());
                 } else {
                     // play calm music
                     chooseCalmMusic();
@@ -826,7 +854,7 @@ public class MainActivity extends AppCompatActivity {
                 gifDrawable = new GifDrawable( getResources(), chooseEuroBeatBackdrop() );
                 gifDrawable.setLoopCount(5);
             } else {
-                gifDrawable = new GifDrawable( getResources(), chooseCalmBackdrop() );
+                gifDrawable = new GifDrawable( getResources(), chooseCalmWallpaperBackdrop() );
                 gifDrawable.setLoopCount(100);
             }
             imageView.setImageDrawable(gifDrawable);
@@ -839,50 +867,61 @@ public class MainActivity extends AppCompatActivity {
      * Choose a calm backdrop gif.
      */
     private int chooseCalmBackdrop() {
+        return R.drawable.street1;
+    }
+
+    /**
+     * Choose a calm mode 2 backdrop.
+     */
+    private int chooseCalmWallpaperBackdrop() {
 
         Random random = new Random();
-        int bound = 12;
+        int bound = 21;
         int number = random.nextInt(bound);
-
-        // if backdrop was same as the last, try to pick another
-        if (number == lastCalmBackdrop) {
-            number = random.nextInt(bound);
-        }
-
-        number = 12;
-
-        // update the backdrop id
-        lastCalmBackdrop = number;
 
         switch(number){
             case 0 :
-                return R.drawable.backdrop_landscape1;
+                return R.drawable.a1;
             case 1 :
-                return R.drawable.backdrop_landscape2;
+                return R.drawable.a2;
             case 2 :
-                return R.drawable.backdrop_landscape3;
+                return R.drawable.a3;
             case 3 :
-                return R.drawable.backdrop_landscape4;
+                return R.drawable.a4;
             case 4 :
-                return R.drawable.backdrop_landscape5;
+                return R.drawable.a5;
             case 5 :
-                return R.drawable.backdrop_landscape6;
+                return R.drawable.a6;
             case 6 :
-                return R.drawable.backdrop_landscape7;
+                return R.drawable.a7;
             case 7 :
-                return R.drawable.backdrop_landscape8;
+                return R.drawable.a8;
             case 8 :
-                return R.drawable.backdrop_landscape9;
+                return R.drawable.a9;
             case 9 :
-                return R.drawable.backdrop_landscape10;
+                return R.drawable.a10;
             case 10 :
-                return R.drawable.backdrop_landscape11;
+                return R.drawable.a11;
             case 11 :
-                return R.drawable.backdrop_landscape12;
+                return R.drawable.a12;
             case 12 :
-                return R.drawable.street1;
-             default:
-                return R.drawable.backdrop_landscape12;
+                return R.drawable.a13;
+            case 13 :
+                return R.drawable.a14;
+            case 14 :
+                return R.drawable.a15;
+            case 15 :
+                return R.drawable.a16;
+            case 16 :
+                return R.drawable.a17;
+            case 17 :
+                return R.drawable.a18;
+            case 18 :
+                return R.drawable.a19;
+            case 19 :
+                return R.drawable.a20;
+            default:
+                return R.drawable.a1;
         }
 
     }
@@ -893,7 +932,7 @@ public class MainActivity extends AppCompatActivity {
     private int chooseEuroBeatBackdrop() {
 
         Random random = new Random();
-        int bound = 48;
+        int bound = 63;
         int number = random.nextInt(bound);
 
         // if backdrop was same as the last, try to pick another
@@ -1001,6 +1040,36 @@ public class MainActivity extends AppCompatActivity {
                 return R.drawable.eurobeat47;
             case 47 :
                 return R.drawable.eurobeat48;
+            case 48 :
+                return R.drawable.eurobeat49;
+            case 49 :
+                return R.drawable.eurobeat50;
+            case 50 :
+                return R.drawable.eurobeat51;
+            case 51 :
+                return R.drawable.eurobeat52;
+            case 52 :
+                return R.drawable.eurobeat53;
+            case 53 :
+                return R.drawable.eurobeat54;
+            case 54 :
+                return R.drawable.eurobeat55;
+            case 55 :
+                return R.drawable.eurobeat56;
+            case 56 :
+                return R.drawable.eurobeat57;
+            case 57 :
+                return R.drawable.eurobeat58;
+            case 58 :
+                return R.drawable.eurobeat59;
+            case 59 :
+                return R.drawable.eurobeat60;
+            case 60 :
+                return R.drawable.eurobeat61;
+            case 61 :
+                return R.drawable.eurobeat62;
+            case 62 :
+                return R.drawable.eurobeat63;
             default:
                 return R.drawable.eurobeat1;
         }
@@ -1013,7 +1082,7 @@ public class MainActivity extends AppCompatActivity {
     private void chooseCalmMusic() {
         // Calm Music Source https://www.youtube.com/watch?v=jrTMMG0zJyI
         String path1 = "calm.mp3";
-        float volume = 0.50f;
+        float volume = 0.30f;
 
         Random random = new Random();
         int bound = 33;
@@ -1150,7 +1219,7 @@ public class MainActivity extends AppCompatActivity {
 
         // set eurobeat active
         euroBeatPlaying = true;
-
+        
         switch(number){
             case 0 :
                 playSong("deja_vu.mp3", volume, 209400);
@@ -1176,17 +1245,23 @@ public class MainActivity extends AppCompatActivity {
 //            case 3 :
 //                playSong("king_of_the_world.mp3", volume, 250400);
 //                break;
-            case 3 :
-                playSong("let_it_burn.mp3", volume, 207600);
-                break;
+//            case 3 :
+//                playSong("let_it_burn.mp3", volume, 207600);
+//                break;
 //            case 10 :
 //                playSong("dont_turn_it_off.mp3", volume, 275600);
 //                break;
-            case 4 :
+            case 3 :
                 playSong("beat_of_the_rising_sun.mp3", volume, 186800);
                 break;
+            case 4 :
+                playSong("spitfire.mp3", volume, 286000);
+                break;
+//            case 5:
+//                playSong("spitfire_dr.mp3", volume, 233000);
+//                break;
             default :
-                playSong("looka_bomba.mp3", volume, 261100);
+                playSong("deja_vu.mp3", volume, 261100);
                 break;
         }
     }
@@ -1198,7 +1273,7 @@ public class MainActivity extends AppCompatActivity {
         float volume = 0.50f;
 
         Random random = new Random();
-        int bound = 23;
+        int bound = 46;
         int number = random.nextInt(bound);
 
         // if track was same as the last, try to pick another
@@ -1279,7 +1354,73 @@ public class MainActivity extends AppCompatActivity {
              case 22:
                 playSong("burning_desire.mp3", volume, 0);
                 break;
-            default :
+             case 23:
+                playSong("rage_your_dream.mp3", volume, 0);
+                break;
+             case 24:
+                playSong("move_break_in2_the_nite.mp3", volume, 0);
+                break;
+             case 25:
+                playSong("move_around_the_world.mp3", volume, 0);
+                break;
+             case 26:
+                playSong("blazin_beat.mp3", volume, 0);
+                break;
+             case 27:
+                playSong("dogfight.mp3", volume, 0);
+                break;
+             case 28:
+                playSong("heartbeat.mp3", volume, 0);
+                break;
+             case 29:
+                playSong("max_power.mp3", volume, 0);
+                break;
+             case 30:
+                playSong("dance_around_the_world.mp3", volume, 0);
+                break;
+             case 31:
+                playSong("i_need_your_love.mp3", volume, 0);
+                break;
+             case 32:
+                playSong("lets_go_come_on.mp3", volume, 0);
+                break;
+            case 33:
+                playSong("speedy_speedy_boy.mp3", volume, 0);
+                break;
+            case 34:
+                playSong("power_two.mp3", volume, 0);
+                break;
+            case 35:
+                playSong("like_a_thunder.mp3", volume, 0);
+                break;
+            case 36:
+                playSong("get_me_power.mp3", volume, 0);
+                break;
+            case 37:
+                playSong("break_the_night.mp3", volume, 0);
+                break;
+            case 38:
+                playSong("dont_you_forget_about_my_love.mp3", volume, 0);
+                break;
+            case 39:
+                playSong("dancing.mp3", volume, 0);
+                break;
+            case 40:
+                playSong("everybody_is_looking.mp3", volume, 0);
+                break;
+            case 41:
+                playSong("spitfire_dr.mp3", volume, 0);
+                break;
+            case 42:
+                playSong("space_rocket.mp3", volume, 0);
+                break;
+            case 43:
+                playSong("kingdom_come.mp3", volume, 0);
+                break;
+            case 44:
+                playSong("project_d.mp3", volume, 0);
+                break;
+             default :
                 playSong("looka_bomba.mp3", volume, 0);
                 break;
         }
