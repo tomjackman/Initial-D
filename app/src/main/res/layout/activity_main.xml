@@ -60,6 +60,15 @@
         android:adjustViewBounds="true"
         app:srcCompat="@drawable/power" />
 
+    <ImageView
+        android:id="@+id/vtecIndicator"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"
+        android:visibility="gone"
+        app:srcCompat="@drawable/vtecindicator" />
+
     <LinearLayout
         android:id="@+id/parameters"
         style="?metaButtonBarStyle"
@@ -81,7 +90,7 @@
             android:drawableLeft="@drawable/rpm"
             android:textColor="@android:color/background_light"
             android:text="0 RPM"
-            android:textSize="20sp" />
+            android:textSize="24sp" />
 
         <Button
             android:id="@+id/speedValue"
@@ -93,7 +102,7 @@
             android:drawableLeft="@drawable/speed"
             android:text="0 KM/H"
             android:textColor="@android:color/background_light"
-            android:textSize="20sp" />
+            android:textSize="24sp" />
 
         <Button
             android:id="@+id/intakeManifoldValue"
@@ -103,9 +112,9 @@
             android:layout_weight="1"
             android:background="@color/black_overlay"
             android:drawableLeft="@drawable/manifold"
-            android:textColor="@android:color/background_light"
             android:text="0 Kpa"
-            android:textSize="20sp" />
+            android:textColor="@android:color/background_light"
+            android:textSize="24sp" />
 
         <Button
             android:id="@+id/throttleValue"
@@ -117,7 +126,7 @@
             android:drawableLeft="@drawable/throttle"
             android:text="0%"
             android:textColor="@android:color/background_light"
-            android:textSize="20sp" />
+            android:textSize="24sp" />
 
         <Button
             android:id="@+id/intakeAirTempValue"
@@ -129,7 +138,7 @@
             android:drawableLeft="@drawable/airintake"
             android:text="0°"
             android:textColor="@android:color/background_light"
-            android:textSize="20sp" />
+            android:textSize="24sp" />
 
     </LinearLayout>
 
@@ -152,7 +161,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:drawableLeft="@drawable/honda"
-            android:text="VTEC"
+            android:text="Track"
             android:textColor="@android:color/background_light"
             android:textSize="20sp" />
 

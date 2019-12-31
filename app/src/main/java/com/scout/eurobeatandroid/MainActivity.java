@@ -69,10 +69,10 @@ public class MainActivity extends AppCompatActivity {
     // -------- vehicle spec -----------
     private final int ACCORD_CL7_EUROR_TRIGGER = 90;
     private final int S2000_TRIGGER = 87;
-    private int THROTTLE_TRIGGER_PERCENTAGE = S2000_TRIGGER;
+    private int THROTTLE_TRIGGER_PERCENTAGE = ACCORD_CL7_EUROR_TRIGGER;
 
     private final int AE86_WARNING_SPEED_TRIGGER = 102;
-    private final int VTEC_RPM_TRIGGER = 5500;
+    private final int VTEC_RPM_TRIGGER = 5000;
     private final String OBD_DEVICE_NAME = "OBDII";
     // -------- vehicle spec -----------
 
@@ -171,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
         coolVibrationsPlayer = new MediaPlayer();
         euroBeatPlaying = false;
         speedChimePlaying = false;
-        chimeEnabled = true;
+        chimeEnabled = false;
 
         // initialise last track index and backdrops
         lastEuroBeatTrack = 0;
@@ -258,9 +258,9 @@ public class MainActivity extends AppCompatActivity {
                 chimeEnabled = !chimeEnabled;
 
                 if (chimeEnabled) {
-                    chimeText.setBackgroundColor(getResources().getColor(R.color.transparent));
+                    chimeText.setTextColor(getResources().getColor(R.color.colorWhite));
                 } else {
-                    chimeText.setBackgroundColor(getResources().getColor(R.color.red));
+                    chimeText.setTextColor(getResources().getColor(R.color.red));
                 }
             }
         });
@@ -561,30 +561,12 @@ public class MainActivity extends AppCompatActivity {
                         TextView rpmText = findViewById(R.id.rpmValue);
                         rpmText.setText(rpmResult);
 
-                        if (rpm > 7500) {
-                            rpmText.setTextColor(getResources().getColor(R.color.red));
-                        } else {
-                            rpmText.setTextColor(getResources().getColor(R.color.colorWhite));
-                        }
-
                         TextView speedText = findViewById(R.id.speedValue);
                         speedText.setText(speedResult);
-
-                        if (speed > 100) {
-                            speedText.setTextColor(getResources().getColor(R.color.red));
-                        } else {
-                            speedText.setTextColor(getResources().getColor(R.color.colorWhite));
-                        }
 
 
                         TextView throttleText = findViewById(R.id.throttleValue);
                         throttleText.setText(thottlePositionResult);
-
-                        if (throttle > 70) {
-                            throttleText.setTextColor(getResources().getColor(R.color.red));
-                        } else {
-                            throttleText.setTextColor(getResources().getColor(R.color.colorWhite));
-                        }
 
                         TextView intakeManifoldText = findViewById(R.id.intakeManifoldValue);
                         intakeManifoldText.setText(intakeManifoldPressureResult);
@@ -602,13 +584,13 @@ public class MainActivity extends AppCompatActivity {
                             intakeAirTempText.setTextColor(getResources().getColor(R.color.red));
                         }
 
-                        TextView vtecText = findViewById(R.id.vtec);
-                        vtecText.setText("VTEC");
+                        ImageView vtecIndicator = findViewById(R.id.vtecIndicator);
 
-                        if (rpm > VTEC_RPM_TRIGGER) {
-                            vtecText.setBackgroundColor(getResources().getColor(R.color.red));
+
+                        if (rpm > VTEC_RPM_TRIGGER && !euroBeatPlaying) {
+                            vtecIndicator.setVisibility(View.VISIBLE);
                         } else {
-                            vtecText.setBackgroundColor(getResources().getColor(R.color.transparent));
+                            vtecIndicator.setVisibility(View.GONE);
                         }
                     }
                 });
